@@ -5,12 +5,13 @@ import 'package:state_mediator/state_mediator.dart';
 
 mixin Mediator<T extends StatefulWidget> on State<T> {
   final Map<String, ValueNotifier<Result>> _state = {};
+  void Function(Object e, StackTrace stackTrace)? _errorHandler;
 
   ValueNotifier<Result> state<E>([String? id]) {
     return _state[id ?? E.toString()] ?? ValueNotifier(Result.loading());
   }
 
-  FutureOr<void> dispatch(Command command) async {
+  Future<void> dispatch(Command command) async {
     final state = _state[command.stateId ?? command.resultType.toString()];
     final handler = StateMediator.getHandler(command);
 
@@ -21,8 +22,16 @@ mixin Mediator<T extends StatefulWidget> on State<T> {
         state?.value = Result.success(result);
       }
     } catch (e, stackTrace) {
-      StateMediator.errorHandler(e, stackTrace);
+      final errorHandler = _errorHandler ?? StateMediator.errorHandler;
+      errorHandler(e, stackTrace);
+      state?.value = Result.error(e.toString());
     }
+  }
+
+  void configMediator({
+    void Function(Object e, StackTrace stackTrace)? errorHandler,
+  }) {
+    _errorHandler = errorHandler;
   }
 
   @override

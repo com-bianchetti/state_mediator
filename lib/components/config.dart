@@ -20,7 +20,5 @@ class StateMediator {
     return handler;
   }
 
-  static void _defaultErrorHandler(Object e, StackTrace stackTrace) {
-    throw e;
-  }
+  static void _defaultErrorHandler(Object e, StackTrace stackTrace) {}
 }
