@@ -8,15 +8,28 @@ mixin Mediator<T extends StatefulWidget> on State<T> {
   void Function(Object e, StackTrace stackTrace)? _errorHandler;
 
   ValueNotifier<Result> state<E>([String? id]) {
-    return _state[id ?? E.toString()] ?? ValueNotifier(Result.loading());
+    if (_state[id ?? E.toString()] == null) {
+      _state[id ?? E.toString()] = ValueNotifier(Result.loading());
+    }
+    return _state[id ?? E.toString()]!;
   }
 
-  Future<void> dispatch(Command command) async {
+  Future<void> dispatchAsync(Command command) {
+    return _dispatch(command, true);
+  }
+
+  Future<void> dispatch(Command command) {
+    return _dispatch(command, false);
+  }
+
+  Future<void> _dispatch(Command command, bool isAsync) async {
     final state = _state[command.stateId ?? command.resultType.toString()];
     final handler = StateMediator.getHandler(command);
 
     try {
-      state?.value = Result.loading();
+      if (isAsync) {
+        state?.value = Result.loading(state.value.data);
+      }
       final result = await handler.handle(command, state?.value.data);
       if (result != null) {
         state?.value = Result.success(result);

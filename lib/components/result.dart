@@ -19,8 +19,8 @@ class Result<T> {
     return Result(data: null, isSuccess: false, isLoading: false, error: error);
   }
 
-  factory Result.loading() {
-    return Result(data: null, isSuccess: false, isLoading: true);
+  factory Result.loading([T? data]) {
+    return Result(data: data, isSuccess: false, isLoading: true);
   }
 
   factory Result.empty() {
