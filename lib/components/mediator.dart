@@ -24,6 +24,14 @@ mixin Mediator<T extends StatefulWidget> on State<T> {
 
   Future<void> _dispatch(Command command, bool isAsync) async {
     final state = _state[command.stateId ?? command.resultType.toString()];
+
+    final newState = command.updateState(state?.value.data);
+
+    if (newState != null) {
+      state?.value = Result.success(newState);
+      return;
+    }
+
     final handler = StateMediator.getHandler(command);
 
     try {

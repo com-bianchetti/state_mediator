@@ -1,3 +1,4 @@
+import 'package:example/commands/count_command.dart';
 import 'package:example/commands/items_command.dart';
 import 'package:example/models/item_model.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
       await dispatchAsync(
         SaveItemCommand(name: _nameController.text, icon: _iconController.text),
       );
+      dispatch(CountCommand());
       _nameController.clear();
       _iconController.clear();
     }
@@ -46,6 +48,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
 
   Future<void> _deleteItem(String id) async {
     await dispatchAsync(DeleteItemCommand(id: id));
+    dispatch(CountCommand());
   }
 
   Future<void> _reorderItems(int oldIndex, int newIndex) async {
@@ -53,6 +56,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
       newIndex -= 1;
     }
     await dispatch(ReorderItemsCommand(oldIndex: oldIndex, newIndex: newIndex));
+    dispatch(CountCommand());
   }
 
   void _showAddItemDialog() {
@@ -127,30 +131,18 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
           ),
         ],
       ),
-      body: ValueListenableBuilder<Result>(
-        valueListenable: state<List<ItemModel>>(),
-        builder: (context, result, _) {
-          if (result.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (result.error != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error: ${result.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _loadItems,
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final items = result.data ?? [];
+      body: StateBuilder<List<ItemModel>>(
+        state: state<List<ItemModel>>(),
+        onLoading: (context) =>
+            const Center(child: CircularProgressIndicator()),
+        onError: (error) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text('Error: $error')],
+          ),
+        ),
+        onSuccess: (data) {
+          final items = data;
 
           if (items.isEmpty) {
             return const Center(
@@ -187,18 +179,24 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Total changes:'),
-                  ValueListenableBuilder(
-                    valueListenable: state<int>(),
-                    builder: (context, value, _) => Text('${value.data ?? 0}'),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 10,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total changes:'),
+                    StateBuilder<int>(
+                      state: state<int>(),
+                      builder: (isLoading, data, error) => Text('${data ?? 0}'),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 130),
             ],
           );
         },
