@@ -4,14 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:state_mediator/state_mediator.dart';
 
 mixin Mediator<T extends StatefulWidget> on State<T> {
-  final Map<String, ValueNotifier<Result>> _state = {};
+  Map<String, ValueNotifier<Result>> _state = {};
   void Function(Object e, StackTrace stackTrace)? _errorHandler;
+  bool _isInitialized = false;
 
   ValueNotifier<Result> state<E>([String? id]) {
     if (_state[id ?? E.toString()] == null) {
       _state[id ?? E.toString()] = ValueNotifier(Result.loading());
     }
     return _state[id ?? E.toString()]!;
+  }
+
+  void initStateStore(StateStore store) {
+    _clearState();
+    _isInitialized = true;
+    _state = store.state;
   }
 
   Future<void> dispatchAsync(Command command) {
@@ -55,13 +62,19 @@ mixin Mediator<T extends StatefulWidget> on State<T> {
     _errorHandler = errorHandler;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _clearState() {
     for (final state in _state.values) {
       state.dispose();
     }
 
     _state.clear();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (!_isInitialized) {
+      _clearState();
+    }
   }
 }

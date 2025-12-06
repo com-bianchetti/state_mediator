@@ -4,3 +4,4 @@ export 'components/mediator.dart';
 export 'components/result.dart';
 export 'components/config.dart';
 export 'components/state.dart';
+export 'components/store.dart';

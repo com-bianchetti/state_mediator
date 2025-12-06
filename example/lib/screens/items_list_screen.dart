@@ -1,6 +1,7 @@
 import 'package:example/commands/count_command.dart';
 import 'package:example/commands/items_command.dart';
 import 'package:example/models/item_model.dart';
+import 'package:example/screens/shared_state.dart';
 import 'package:flutter/material.dart';
 import 'package:state_mediator/state_mediator.dart';
 
@@ -124,6 +125,17 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
       appBar: AppBar(
         title: const Text('Items List'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.numbers),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Page01()),
+              );
+            },
+            tooltip: 'Settings',
+          ),
+          const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadItems,
