@@ -109,6 +109,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
             onPressed: () async {
               await _addItem();
               if (mounted) {
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pop();
               }
             },
