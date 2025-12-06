@@ -56,7 +56,7 @@ class _ItemsListScreenState extends State<ItemsListScreen> with Mediator {
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
-    await dispatch(ReorderItemsCommand(oldIndex: oldIndex, newIndex: newIndex));
+    dispatch(ReorderItemsCommand(oldIndex: oldIndex, newIndex: newIndex));
     dispatch(CountCommand());
   }
 
