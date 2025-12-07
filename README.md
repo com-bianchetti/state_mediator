@@ -17,7 +17,7 @@ Add `state_mediator` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  state_mediator: ^1.0.0
+  state_mediator: ^1.0.2
 ```
 
 ## Usage

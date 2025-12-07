@@ -1,6 +1,6 @@
 name: state_mediator
 description: "A Flutter package implementing the mediator pattern to automate state management and eliminate repetitive code for managing states."
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/com-bianchetti/state_mediator
 
 environment:
